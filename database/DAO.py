@@ -7,24 +7,26 @@ class DAO():
     def __init__(self):
         pass
 
+    # -----------------------------------------------------------------------------------------------------------------------------
     @staticmethod
     def getAllNerc():
-        conn = DBConnect.get_connection()
+        cnx = DBConnect.get_connection()
+        ris = []
 
-        result = []
-
-        cursor = conn.cursor(dictionary=True)
-        query = """ ADD YOUR QUERY """
+        cursor = cnx.cursor(dictionary=True)
+        query = """ select * from Nerc n """
 
         cursor.execute(query)
 
+        #lista di ogg Nerc
         for row in cursor:
-            result.append(Nerc(row["id"], row["value"]))
-
+            ris.append( Nerc( row["id"],
+                              row["value"]))
         cursor.close()
-        conn.close()
-        return result
+        cnx.close()
+        return ris
 
+    # -----------------------------------------------------------------------------------------------------------------------------
     @staticmethod
     def getAllEvents(nerc):
         conn = DBConnect.get_connection()
@@ -32,9 +34,13 @@ class DAO():
         result = []
 
         cursor = conn.cursor(dictionary=True)
-        query = """ ADD YOUR QUERY """
+        query = """ select * 
+                    from eventtype e, poweroutages p
+                    where e.id = p.event_type_id
+                    and p.nerc_id = %s"""
 
         cursor.execute(query, (nerc.id,))
+
 
         for row in cursor:
             result.append(
@@ -47,3 +53,5 @@ class DAO():
         cursor.close()
         conn.close()
         return result
+
+    # -----------------------------------------------------------------------------------------------------------------------------
